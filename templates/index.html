@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Option Chain Visualizer</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 2em;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        h1, h2 {
+            color: #333;
+            text-align: center;
+        }
+        form {
+            max-width: 600px;
+            margin: 1em auto 2em auto;
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            justify-content: center;
+        }
+        input[type="text"], button {
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        input[type="text"] { flex-grow: 1; }
+        button {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            border: none;
+            transition: background-color 0.2s;
+        }
+        button:hover { background-color: #0056b3; }
+        .plot-container { text-align: center; }
+        img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ddd;
+            background: white;
+            padding: 5px;
+            border-radius: 8px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="loader" style="display: none;"></div>
+
+    <h1>Option Chain Visualizer</h1>
+
+    <form action="/plot" method="GET">
+        <input type="text" name="ticker" placeholder="Enter Ticker (e.g., AAPL)" value="{{ ticker or '' }}" required>
+
+        <div>
+            <input type="radio" id="calls" name="option_type" value="calls" {% if not option_type or option_type == 'calls' %}checked{% endif %}>
+            <label for="calls">Calls</label>
+        </div>
+
+        <div>
+            <input type="radio" id="puts" name="option_type" value="puts" {% if option_type == 'puts' %}checked{% endif %}>
+            <label for="puts">Puts</label>
+        </div>
+
+        <button type="submit">Generate Plot</button>
+    </form>
+
+    <div class="plot-container">
+        {% if error %}
+            <h2>{{ error }}</h2>
+        {% elif plot_url %}
+            <h2>Displaying {{ option_type.capitalize() }} for {{ ticker.upper() }}</h2>
+            <p>Green = In-the-Money, Red = Out-of-the-Money</p>
+            <img src="data:image/png;base64,{{ plot_url }}" alt="Option Chain Plot for {{ ticker }}">
+        {% else %}
+            <h2>Enter a ticker to generate a plot.</h2>
+        {% endif %}
+    </div>
+
+</body>
+</html>
